@@ -1,4 +1,4 @@
-# Recall
+# 螺纹紧固件召回监控（fastener-recall-monitor）
 
 每日检查市场监管总局机动车召回公告，**只核对新增公告、只上传确认后的增量**，并把简短运行日志写入简道云。
 
@@ -29,8 +29,8 @@
 需要 Python 3.11+、Git；支持 Windows、macOS 和 Linux。运行时仅使用 Python 标准库。
 
 ```sh
-git clone https://github.com/zhenyedl/Recall.git
-cd Recall
+git clone https://github.com/zhenyedl/fastener-recall-monitor.git
+cd fastener-recall-monitor
 python -m venv .venv
 ```
 
