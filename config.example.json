@@ -1,0 +1,25 @@
+{
+  "app_id": "REPLACE_WITH_YOUR_APP_ID",
+  "recall_entry_id": "REPLACE_WITH_YOUR_RECALL_FORM_ID",
+  "log_entry_id": "REPLACE_WITH_YOUR_LOG_FORM_ID",
+  "record_fields": {
+    "日期": "REPLACE_WITH_DATE_FIELD",
+    "公司": "REPLACE_WITH_COMPANY_FIELD",
+    "车型": "REPLACE_WITH_MODEL_FIELD",
+    "数量": "REPLACE_WITH_QUANTITY_FIELD",
+    "分类": "REPLACE_WITH_CATEGORY_FIELD",
+    "原因": "REPLACE_WITH_REASON_FIELD",
+    "来源URL": "REPLACE_WITH_URL_FIELD",
+    "备注": "REPLACE_WITH_NOTES_FIELD"
+  },
+  "log_fields": {
+    "运行时间": "REPLACE_WITH_RUN_TIME_FIELD",
+    "本次新增召回": "REPLACE_WITH_NEW_COUNT_FIELD",
+    "本次推送简道云": "REPLACE_WITH_PUSH_COUNT_FIELD",
+    "判定结论": "REPLACE_WITH_CONCLUSION_FIELD",
+    "逐条明细": "REPLACE_WITH_DETAIL_FIELD",
+    "子代理交叉比对": "REPLACE_WITH_CROSSCHECK_FIELD",
+    "推送 data_id": "REPLACE_WITH_IDS_FIELD"
+  },
+  "private_terms": []
+}

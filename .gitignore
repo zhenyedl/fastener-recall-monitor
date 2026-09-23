@@ -1,0 +1,39 @@
+# Credentials and per-installation settings
+.env
+.env.*
+!.env.example
+config.json
+config.*.json
+!config.example.json
+api_key*
+*.pem
+*.key
+
+# Private state, snapshots, reviews, exports and logs
+.recall/
+state/
+data/
+logs/
+backups/
+private/
+candidates*.json
+reviews*.json
+*.xlsx
+*.xlsm
+*.csv
+*.sqlite*
+*.db
+*.log
+
+# Python/build/editor output
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.coverage
+.vscode/
+.idea/
