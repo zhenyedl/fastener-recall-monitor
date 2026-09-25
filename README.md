@@ -1,6 +1,28 @@
 # 螺纹紧固件召回监控（fastener-recall-monitor）
 
-每天盯住中国、美国、日本、德国四路官方召回信息，从中找出**缺陷本体是螺纹紧固件**的机动车召回，核对确认后把增量写入简道云，并留下一条当日运行日志。
+每天盯住中国、美国、日本、德国四路官方召回信息，从中找出**缺陷本体是螺纹紧固件**的机动车召回，核对确认后把增量写入简道云，并留下一条当日运行日志。本仓库是一套面向 Codex 的标准工作流：定时任务提示词驱动 CLI 完成采集、增量判定与上传，公告正文由两个独立子代理交叉核对。
+
+## 用 Codex 即装即用
+
+工作流的核心是 [prompts/daily-task.md](prompts/daily-task.md)：把它设为 Codex 定时任务的提示词，主代理就会按流程调用本仓库 CLI，并在有新增时派出两个子代理独立核对公告正文。你要做的只有初始配置。
+
+前置条件：Python 3.11+（仅标准库）、简道云账号、支持子代理委派的 Codex 环境。
+
+```sh
+git clone https://github.com/zhenyedl/fastener-recall-monitor.git
+cd fastener-recall-monitor
+python -m venv .venv && . .venv/bin/activate   # Windows: .\.venv\Scripts\Activate.ps1
+python -m pip install .
+cp config.example.json config.json
+python -m recall init
+```
+
+1. 在自己的简道云建“召回数据”和“运行日志”两个表单，把应用、表单、字段 ID 填入本地 `config.json`，并为进程设置 `JDY_API_KEY` 环境变量。详见[简道云配置](docs/jiandaoyun.md)。
+2. 在 Codex 中打开本仓库目录，把 [prompts/daily-task.md](prompts/daily-task.md) 设为定时任务的提示词（调度频率自行设置，详见[调度说明](docs/scheduling.md)），并填入本机工作目录、状态目录和私有配置位置。不要把带真实配置的提示词提交回本仓库。
+3. 配置模型：主代理建议 GLM；两个核对子代理分别使用 DeepSeek-V4.1-Flash 和 Kimi-K3（经 AliBailian 路由的模型名见提示词）。任一子代理不可用时任务会保留批次并如实报告，不会谎称核对完成。
+4. 之后无需人工介入：无新增时只写当日日志；有新增时子代理双路独立核对，结论一致才入表，存疑保留待人工处理；抓取失败保留断点，下次自动恢复。CLI 退出码 3（有新增待核对）、4（旧批恢复）由主代理自行处理。
+
+没有代理环境时，可以用同一套 CLI 手动驱动，见下文[手动运行](#手动运行)。
 
 ## 业务说明
 
@@ -44,25 +66,19 @@
 - 同一公告或届出涉及多个公司时按公司拆分为多行：数量按该公司口径，不把多公司合并为一条。
 - 外文公司名转换为统一的中文规范简称（如 Mercedes-Benz → 梅赛德斯-奔驰）；同一厂商在全表只有一种中文名。
 
-## 使用
+## 手动运行
 
 本仓库 CLI 实现国内（市场监管总局）部分的采集、判定与上传；海外三路在私有部署脚本中运行，仓库不含其代码、凭据或数据。
 
-需要 Python 3.11+，运行时仅用标准库。
+每日运行：
 
 ```sh
-git clone https://github.com/zhenyedl/fastener-recall-monitor.git
-cd fastener-recall-monitor
-python -m venv .venv && . .venv/bin/activate   # Windows: .\.venv\Scripts\Activate.ps1
-python -m pip install .
-cp config.example.json config.json
+python -m recall run --url https://www.samr.gov.cn/zw/zh/ --since 上次边界日期 --config config.json
 ```
 
-1. 在自己的简道云建“召回数据”和“运行日志”两个表单，把应用、表单、字段 ID 填入本地 `config.json`，并为进程设置 `JDY_API_KEY` 环境变量。详见[简道云配置](docs/jiandaoyun.md)。
-2. `recall init` 初始化私有状态目录（默认 `.recall/`）。
-3. 每日运行 `recall run --url https://www.samr.gov.cn/zw/zh/ --since 上次边界日期 --config config.json`。退出码 `3` 表示有新增待核对：阅读 NEW 公告正文，按[数据格式](docs/data-format.md)保存判定，再执行 `recall review` 和 `recall sync` 完成本批。
-4. 定时运行（Windows 任务计划程序、Linux/macOS 调度或代理调度）见[调度说明](docs/scheduling.md)；代理提示词见 [prompts/daily-task.md](prompts/daily-task.md)。
+退出码 `3` 表示有新增待核对：阅读 NEW 公告正文，按[数据格式](docs/data-format.md)保存判定，再执行 `recall review` 和 `recall sync` 完成本批。用 Windows 任务计划程序或 Linux/macOS 调度器直接运行 CLI 的方法见[调度说明](docs/scheduling.md)。
 
 ## 隐私
 
 仓库不包含任何使用者的简道云配置、凭据、历史台账或业务数据；`config.json`、`.recall/` 等运行状态均被 Git 忽略。提交前可用 `python tools/check_public.py` 复查。安全细节见 [SECURITY.md](SECURITY.md)，许可证 [MIT](LICENSE)。
+
